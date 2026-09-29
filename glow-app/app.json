@@ -1,0 +1,28 @@
+{
+  "expo": {
+    "name": "Glow",
+    "slug": "glow-live",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.glowlive.app"
+    },
+    "android": {
+      "package": "com.glowlive.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundColor": "#b8429e"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ca3c7c"
+    }
+  }
+}
