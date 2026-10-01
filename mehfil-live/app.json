@@ -1,0 +1,24 @@
+{
+  "expo": {
+    "name": "Mehfil Live",
+    "slug": "mehfil-live-studio-royale",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#0a0612",
+    "splash": {
+      "backgroundColor": "#0a0612"
+    },
+    "android": {
+      "package": "com.mehfillive.studioroyale",
+      "versionCode": 1,
+      "softwareKeyboardLayoutMode": "resize",
+      "adaptiveIcon": {
+        "backgroundColor": "#0a0612"
+      }
+    },
+    "ios": {
+      "bundleIdentifier": "com.mehfillive.studioroyale"
+    }
+  }
+}
