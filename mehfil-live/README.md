@@ -1,39 +1,41 @@
-# Mehfil Live · Studio Royale (Android)
+# Mehfil Live (v2) — Android prototype
 
-React Native (Expo SDK 57) app: 20 performers on one stage, with gifting, song requests, private rooms, VIP, coins and a Director console.
+React Native (Expo SDK 57) prototype built to BRD v2 (audience-journey-led). It has three views, switched from the top-right menu:
 
-## Option A: Get an APK from GitHub (free, no setup on your computer)
+- **Customer**: the 7-stage journey, from discovering the app to becoming a top fan
+- **Dancer app**: the supply side. You play "Priya".
+- **Floor manager**: the movement engine, remote config and moderation
 
-1. Create a new repository on github.com (it can be private).
-2. Upload **all files in this folder**, including the hidden `.github` folder. Easiest way: on the repo page click **Add file → Upload files**, then drag the whole unzipped folder in.
-   - If the `.github` folder doesn't upload by drag-and-drop, click **Add file → Create new file**, type `.github/workflows/build-apk.yml` as the name, and paste in the contents of that file.
-3. Open the **Actions** tab. The **Build Android APK** run starts by itself; if it doesn't, select it and click **Run workflow**. It takes about 10–15 minutes.
-4. When it shows a green tick, open the run and download **mehfil-live-apk** under *Artifacts*. Unzip it to get `app-release.apk`.
-5. Copy the APK to your phone, open it, and allow "Install unknown apps" when Android asks.
+Dancers are animated figures performing dance only. Coins and payments are demo-only.
 
-## Option B: Try it instantly with Expo Go
+## Get the APK (GitHub, free)
 
-1. Install **Expo Go** from the Play Store.
-2. Install Node.js 20+ on your computer, then in this folder run:
-   ```
-   npm install
-   npx expo start
-   ```
-3. Scan the QR code with Expo Go (phone and computer on the same Wi-Fi).
+1. Create a new GitHub repository and upload **everything in this folder**, including the hidden `.github` folder.
+2. Open **Actions → Build Android APK**. It starts on push, or you can click **Run workflow**. It takes about 10–15 minutes.
+3. Download **mehfil-live-apk** from the finished run, unzip it, copy `app-release.apk` to your phone and install it. Allow "Install unknown apps" when asked.
 
-## What's in the app
+## Or try it in Expo Go
 
-| Area | Features |
+```
+npm install
+npx expo start
+```
+Scan the QR code with Expo Go. Your phone and computer need to be on the same Wi-Fi.
+
+## What maps to the BRD
+
+| Journey stage | In the app |
 |---|---|
-| Entry | 18+ gate, studio lobby (4 live studios) |
-| Stage | 5×4 grid of 20 animated dancers, live rank, coins, spotlight, group dance |
-| Cameras | Wide (free), Close-Up 50, Side 30, Top 40, Backstage 100. Each unlock lasts 5 minutes, and close-ups are free for VIPs |
-| Gifts | 9 tiers from Rose (10) to Stage Call (5,000), each with its own animation and a performer thank-you |
-| Songs | 10-song catalogue, bid for priority, live queue, auto-play with a "now playing" banner |
-| Perks | Shout-out (100), Private Room 5 min (500) / 15 min (1,300) with a countdown, chat and +5 min extension, VIP ₹999/month |
-| Coins | Wallet, 4 recharge packs with bonuses, transaction history |
-| Leaderboard | All 20 performers ranked live |
-| Director | Master camera ("Director's Cut" pushed to viewers), announcements, spotlight top earner, group dance, skip song, live stats, top 5 |
-| Live sim | Viewer count, fan chat, fan gifts and fan song requests every 4 seconds |
+| 1 Discover | Live stage preview before any wall; invite friends link (WhatsApp/Telegram share); dancer profile share; deep links `mehfillive://dancer/<id>` and `mehfillive://invite/<code>`; discreet app name |
+| 2 Enter | One-tap 18+ gate, language at first open (English, Hindi; Marathi, Bengali, Tamil, Telugu fall back to English), free viewing with no login. Sign-up (phone OTP, demo code 1234, display name, default avatar) appears only on first spend |
+| 3 Browse | Scrollable grid of live dancers with rank, coins, languages and live status, plus an "In private room · back in X min" section; filters for language, specialty, availability, popular and new; search; NEW badges; dancer profile with bio, photos, top fans; bench backfill keeps the stage full; "explore similar dancers" when the one you're watching leaves |
+| 4 Engage | Gifts from Rose 10 to Stage Call 5,000, animated; 1,000+ confirmation; shout-out; dancer thanks you by name; live chat; follow; low balance opens recharge; +50 first-purchase bonus; ⭐ top-fan tag in chat; song request with dedication (refunded if not played) |
+| 5 Go Private | Book on every card and profile; prices up front; confirmation; dancer accepts or declines; she leaves the stage live and her slot is backfilled; countdown; +5 min extension; pro-rata refund if she ends early; report; rating; "She'll remember you" follow prompt; studio room cap with waitlist |
+| 6 Return | Following list with live status; in-app alerts when a favourite goes live or is free; dancer greets returning customers; "Your top dancers" on home; tonight's summary; private room history (only you) |
+| 7 Belong | Top-spender and top-dancer leaderboards; top-fan badges; exclusive gifts above 5,000 (unlock at 10,000 spent or VIP); priority booking for VIP and top fans; VIP ₹999/month; festive gift; room package (buy 5 get 1 free); concierge chat for whales |
+| Dancer journey | Availability (available, busy, break, off shift); accept or decline requests without penalty; end room early; real-time earnings and ledger; top fans; rate-limited message to followers; block customers; support line; KYC and bank verified status |
+| Movement engine | Stage cap 16, minimum 12 (configurable), max 6 rooms (configurable), bench backfill under 5 s, automatic return to stage or bench, floor override (force return, end room, bench, break, off), kill switch, per-dancer split, announcements, reports queue |
 
-**Prototype note:** the performers are animated simulations and all purchases are demo purchases. No real payments are taken.
+## Not in this prototype
+
+Real video, real payments or OTP SMS, push notifications (alerts are in-app), and a server. Every viewer, dancer and room is simulated on the phone.
