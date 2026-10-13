@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
-  FlatList, KeyboardAvoidingView, Modal, Pressable, ScrollView, Share, Text, TextInput, View, useWindowDimensions,
+  Animated, Easing, FlatList, KeyboardAvoidingView, Modal, Pressable, ScrollView, Share, Text, TextInput, View, useWindowDimensions,
 } from 'react-native';
 import Dancer from './Dancer';
 import { Banner, Btn, Chip, DancerCard, Floater, Sheet, Stat, st, statusInfo } from './ui';
@@ -317,7 +317,7 @@ const ChatLine = React.memo(function ChatLine({ m, me, badge, vip }) {
 });
 
 // BR-42/43: pricing upfront + confirmation before coins move
-function BookSheet({ visible, p, S, onClose, onBook }) {
+export function BookSheet({ visible, p, S, onClose, onBook }) {
   const [min, setMin] = useState(5);
   const [credit, setCredit] = useState(false);
   const price = credit ? 0 : min === 5 ? S.config.price5 : S.config.price15;
@@ -444,9 +444,26 @@ export function PrivateRoom({ S, act, pad, toast }) {
             <Pressable key={r} onPress={() => { setReportOpen(false); act.reportRoom(r); }} style={st.listRow}><Text style={st.body}>{r}</Text></Pressable>
           ))}
         </Sheet>}
+        {(S.now || Date.now()) - room.startAt < 2600 && <WalkIn p={p} />}
         {toast}
       </KeyboardAvoidingView>
     </Modal>
+  );
+}
+
+// She walks from the stage into the private room
+function WalkIn({ p }) {
+  const { width, height } = useWindowDimensions();
+  const a = React.useRef(new Animated.Value(0)).current;
+  useEffect(() => { Animated.timing(a, { toValue: 1, duration: 2200, easing: Easing.out(Easing.quad), useNativeDriver: true }).start(); }, []);
+  return (
+    <Animated.View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, backgroundColor: 'rgba(10,6,18,0.92)', alignItems: 'center', justifyContent: 'center', opacity: a.interpolate({ inputRange: [0, 0.85, 1], outputRange: [1, 1, 0] }), zIndex: 90 }}>
+      <Animated.View style={{ transform: [{ translateX: a.interpolate({ inputRange: [0, 0.7, 1], outputRange: [-width * 0.6, 0, 0] }) }] }}>
+        <Dancer p={p} size={height * 0.3} mode="performing" />
+      </Animated.View>
+      <Text style={[st.h3, { marginTop: 12 }]}>💃 {p.name} is walking to your private room…</Text>
+      <Text style={st.meta}>She has left the stage — the show goes on for everyone else</Text>
+    </Animated.View>
   );
 }
 

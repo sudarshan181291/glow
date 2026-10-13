@@ -9,6 +9,7 @@ import {
 } from './src/customer';
 import { DancerHome } from './src/dancerApp';
 import { FloorConsole } from './src/floor';
+import { StageHome } from './src/stage';
 import { C, fmt } from './src/data';
 import { t } from './src/i18n';
 
@@ -87,7 +88,7 @@ function Main() {
       </View>
 
       <View style={{ flex: 1 }}>
-        {S.role === 'customer' && tab === 'stage' && <StageTab S={S} act={act} rankOf={rankOf} />}
+        {S.role === 'customer' && tab === 'stage' && <StageHome S={S} act={act} rankOf={rankOf} />}
         {S.role === 'customer' && tab === 'following' && <FollowingTab S={S} act={act} />}
         {S.role === 'customer' && tab === 'leaders' && <LeadersTab S={S} act={act} ranked={ranked} />}
         {S.role === 'customer' && tab === 'me' && <MeTab S={S} act={act} />}

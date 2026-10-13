@@ -57,6 +57,7 @@ function initState() {
     lastWatchStart: 0,
     sessionDone: false,
     pendingLink: null,
+    stageChat: [],
   };
 }
 
@@ -74,10 +75,20 @@ export const exclusivesUnlocked = (u) => u.total >= EXCLUSIVE_UNLOCK || isVip(u)
 
 function toast(d, text) { d.toast = { id: nid(), text }; }
 function banner(d, text, color = C.gold) { d.banners.push({ id: nid(), text, color }); if (d.banners.length > 4) d.banners.shift(); }
+const THANKS_RE = /thank|shukriya|for you|welcome back|is here|missed you/i;
+function stagePush(d, m) {
+  d.stageChat.push({ id: nid(), ...m });
+  if (d.stageChat.length > 60) d.stageChat.shift();
+}
 function chatPush(d, did, m) {
   const list = d.chats[did] || (d.chats[did] = []);
   list.push({ id: nid(), ...m });
   if (list.length > 60) list.shift();
+  // mirror gifts and stage events to the shared stage chat
+  if (m.kind === 'system') stagePush(d, m);
+  if (m.kind === 'dancer' && m.text.includes('{')) return;
+  if (m.kind === 'dancer' && THANKS_RE.test(m.text)) stagePush(d, m);
+  if (m.kind === 'gift' || m.kind === 'mygift') stagePush(d, { ...m, text: `${m.text} → ${get(d, did)?.name}` });
 }
 function schedule(d, ms, item) { d.scheduled.push({ at: Date.now() + ms, ...item }); }
 function fly(d, did, emoji, anim) {
@@ -205,6 +216,7 @@ function tick(d, now) {
     d.scheduled = d.scheduled.filter((s) => s.at > now);
     due.forEach((s) => {
       if (s.type === 'chat') chatPush(d, s.did, s.msg);
+      if (s.type === 'stage') stagePush(d, s.msg);
       if (s.type === 'room' && d.myRoomId) d.roomChat.push({ id: nid(), from: 'her', text: s.text });
     });
   }
@@ -249,6 +261,7 @@ function tick(d, now) {
       const next = bench[0];
       next.status = 'stage';
       next.since = now;
+      stagePush(d, { kind: 'system', text: `💃 ${next.name} walked onto the stage` });
       notifyFollowers(d, next, `${next.name} is live now`);
       d.backfillAt = null;
     }
@@ -279,6 +292,8 @@ function simulate(d, now) {
   if (d.screen === 'gate') return;
   const stage = onStage(d);
   if (!stage.length) return;
+  if (Math.random() < 0.6) stagePush(d, { kind: 'fan', user: pick(FAN_NAMES), text: pick(FAN_LINES) });
+  if (Math.random() < 0.2) { const sd = pick(stage); stagePush(d, { kind: 'dancer', user: sd.name, text: pick(DANCER_LINES) }); }
   const w = d.watching != null ? get(d, d.watching) : null;
   if (w && w.status === 'stage') {
     if (Math.random() < 0.75) chatPush(d, w.id, { kind: 'fan', user: pick(FAN_NAMES), text: pick(FAN_LINES) });
@@ -439,6 +454,14 @@ export function useStudio() {
           creditDancer(d, dn, song.price, d.user.name, 'song', true);
           d.songs.push({ id: nid(), did, song, cost: song.price, user: d.user.name, mine: true, dueAt: Date.now() + 8000 + Math.random() * 6000 });
           toast(d, `Requested "${song.title}" — ${dn.name} will dedicate it to you`);
+        });
+      },
+      sendStageChat: (text) => {
+        if (gated('sendStageChat', [text])) return;
+        up((d) => {
+          stagePush(d, { kind: 'me', user: d.user.name, text });
+          const st = onStage(d);
+          if (st.length && Math.random() < 0.6) { const sd = pick(st); schedule(d, 1500, { type: 'stage', msg: { kind: 'dancer', user: sd.name, text: `${d.user.name} ${pick(['thank you! 💕', 'aap ka swagat hai 🙏', 'this one is for you 💃', '✨✨✨'])}` } }); }
         });
       },
       sendChat: (did, text) => {
