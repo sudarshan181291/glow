@@ -1,0 +1,15 @@
+{
+  "cli": { "version": ">= 16.0.0", "appVersionSource": "local" },
+  "build": {
+    "apk": {
+      "distribution": "internal",
+      "android": { "buildType": "apk" },
+      "env": { "APP_CHANNEL": "apk", "API_URL": "https://api.yourdomain.com" }
+    },
+    "play": {
+      "android": { "buildType": "app-bundle" },
+      "env": { "APP_CHANNEL": "play", "API_URL": "https://api.yourdomain.com" }
+    }
+  },
+  "submit": { "play": { "android": { "track": "internal" } } }
+}

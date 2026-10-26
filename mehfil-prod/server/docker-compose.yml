@@ -1,0 +1,40 @@
+# Local or single-server deployment: PostgreSQL + API (+ optional local LiveKit for testing).
+# Production: use a managed PostgreSQL and LiveKit Cloud, and put the API behind HTTPS.
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: mehfil
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-mehfil_local_only}
+      POSTGRES_DB: mehfil
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U mehfil"], interval: 5s, retries: 10 }
+    restart: unless-stopped
+
+  api:
+    build: .
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://mehfil:${DB_PASSWORD:-mehfil_local_only}@db:5432/mehfil
+    ports: ["8080:8080"]
+    depends_on: { db: { condition: service_healthy } }
+    restart: unless-stopped
+
+  seed:
+    build: .
+    command: ["node", "dist/db/seed.js"]
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://mehfil:${DB_PASSWORD:-mehfil_local_only}@db:5432/mehfil
+    depends_on: { db: { condition: service_healthy } }
+    profiles: [setup]
+
+  # Local LiveKit for development only (use LiveKit Cloud in production).
+  livekit:
+    image: livekit/livekit-server:latest
+    command: ["--dev", "--bind", "0.0.0.0"]
+    ports: ["7880:7880", "7881:7881", "7882:7882/udp"]
+    profiles: [video]
+
+volumes:
+  pgdata:
