@@ -46,6 +46,7 @@ function initState() {
     walletOpen: false,
     selfId: roster.find((r) => r.name === 'Priya').id,
     selfBusy: false,
+    selfCamera: false,
     incoming: [],
     selfMsgAt: 0,
     blocked: [],
@@ -537,6 +538,22 @@ export function useStudio() {
       consumeLink: () => up((d) => { if (d.pendingLink != null) { d.watching = d.pendingLink; d.pendingLink = null; } }),
 
       // ---------- dancer app ----------
+      setSelfCamera: (on) => up((d, now) => {
+        d.selfCamera = on;
+        const me = get(d, d.selfId);
+        if (!on) { toast(d, 'You ended your live camera'); return; }
+        d.selfBusy = false;
+        if (me.status !== 'stage' && me.status !== 'private') {
+          // going live puts her on stage; if the stage is full, the longest-serving dancer rests on the bench
+          if (onStage(d).length >= d.config.stageCap) {
+            const out = onStage(d).filter((x) => x.id !== me.id).sort((a, b) => a.since - b.since)[0];
+            if (out) { out.status = 'bench'; out.since = now; }
+          }
+          me.status = 'stage'; me.since = now; me.returnAt = null;
+          stagePush(d, { kind: 'system', text: `📷 ${me.name} went live on camera` });
+          notifyFollowers(d, me, `${me.name} is live now on camera`);
+        }
+      }),
       setSelfAvailability: (mode) => up((d, now) => {
         const me = get(d, d.selfId);
         if (me.status === 'private' && mode !== 'available') { toast(d, 'Finish your private room first'); return; }

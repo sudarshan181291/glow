@@ -92,7 +92,7 @@ function Main() {
         {S.role === 'customer' && tab === 'following' && <FollowingTab S={S} act={act} />}
         {S.role === 'customer' && tab === 'leaders' && <LeadersTab S={S} act={act} ranked={ranked} />}
         {S.role === 'customer' && tab === 'me' && <MeTab S={S} act={act} />}
-        {S.role === 'dancer' && <DancerHome S={S} act={act} />}
+        {S.role === 'dancer' && <DancerHome S={S} act={act} pad={pad} />}
         {S.role === 'floor' && <FloorConsole S={S} act={act} />}
         {S.watching == null && S.banners[0] && <Banner key={S.banners[0].id} b={S.banners[0]} onDone={act.shiftBanner} />}
         {S.liveNotif && S.watching == null && (

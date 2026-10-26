@@ -40,3 +40,22 @@ Scan the QR code with Expo Go. Your phone and computer need to be on the same Wi
 ## Not in this prototype
 
 Real video, real payments or OTP SMS, push notifications (alerts are in-app), and a server. Every viewer, dancer and room is simulated on the phone.
+
+## Performer video and photos
+
+- Every dancer has a looping performance video and a photo. They're used in the **📹 Video wall**, which puts every on-stage dancer's video on one screen, and in her profile, the quick panel, the private room and the "All dancers" cards.
+- The bundled clips in `assets/videos` are **dummy placeholders** marked "DEMO VIDEO" (8 clips shared across 32 dancers, about 125 KB each).
+- To use real footage, edit `src/media.js`:
+
+```js
+MEDIA_OVERRIDES.Priya = { video: 'https://cdn.example.com/priya.mp4', photo: 'https://cdn.example.com/priya.jpg' };
+// or bundled files:
+MEDIA_OVERRIDES.Noor = { video: require('../assets/videos/noor.mp4'), photo: require('../assets/posters/noor.jpg') };
+```
+Use short vertical MP4 loops (H.264, about 360×640, 5–10 s). Use only footage your performers have consented to. Label AI-generated performers as AI in the app.
+
+## Go live with camera (Dancer app)
+
+- **Dancer app → 📷 Go live with camera** asks for camera and microphone permission and shows the dancer's real front camera full screen, with a live timer, viewer count, flip-camera button, gifts arriving, private-room requests (accept or decline) and her earnings.
+- Going live puts her on stage. Switch to the Customer view and open Priya's profile to see her camera in place of the demo clip, marked "📷 LIVE CAMERA". Use **End live** in the Dancer app to stop.
+- **Limit of this prototype:** the camera stays on the same phone. To send it to other people's phones you need a live-video service (for example LiveKit, Agora or 100ms) plus a server. That's Step 5 of the beginner's guide.

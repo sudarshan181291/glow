@@ -9,6 +9,7 @@ import { C, GIFTS, fmt, fmtK, mmss } from './data';
 import { BookSheet, StageTab } from './customer';
 import { isVip, topFanOf } from './store';
 import { t } from './i18n';
+import { DanceVideo, Poster } from './media';
 
 // ---------- stage geometry ----------
 function rowsFor(W, H) {
@@ -132,7 +133,7 @@ function Leaving({ g, W, H, onDone }) {
   );
 }
 
-export function LiveStage({ S, act, rankOf }) {
+export function LiveStage({ S, act, rankOf, mode = 'stage' }) {
   const { width, height } = useWindowDimensions();
   const W = width;
   const H = Math.round(Math.min(540, Math.max(360, height * 0.56)));
@@ -191,8 +192,9 @@ export function LiveStage({ S, act, rankOf }) {
 
   return (
     <View style={{ flex: 1 }}>
+      {mode === 'wall' && <VideoWall S={S} W={W} H={SH} rankOf={rankOf} onSelect={setSel} now={now} />}
       {/* the one shared stage */}
-      <View style={{ width: W, height: SH, overflow: 'hidden', backgroundColor: C.bg2 }}>
+      {mode === 'stage' && <View style={{ width: W, height: SH, overflow: 'hidden', backgroundColor: C.bg2 }}>
         <StageBackdrop W={W} H={SH} />
         {onStage.map((p) => (
           <OnStage
@@ -219,7 +221,7 @@ export function LiveStage({ S, act, rankOf }) {
           <Text style={{ color: C.text, fontSize: 11, fontWeight: '700' }}>{onStage.length} on stage</Text>
         </View>
         <Text style={{ position: 'absolute', bottom: 6, alignSelf: 'center', color: C.dim, fontSize: 10, zIndex: 90 }}>Tap any dancer to gift, book or follow</Text>
-      </View>
+      </View>}
 
       {/* private-room doors */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0 }} contentContainerStyle={{ gap: 6, paddingHorizontal: 8, paddingVertical: 6 }}>
@@ -274,7 +276,7 @@ export function LiveStage({ S, act, rankOf }) {
       {selP && (
         <Sheet visible onClose={() => setSel(null)} title={`${selP.name}  #${rankOf[selP.id]}`}>
           <View style={[st.row, { gap: 12 }]}>
-            <View style={{ width: 64, height: 80, justifyContent: 'flex-end', alignItems: 'center' }}><Dancer p={selP} size={78} mode="performing" /></View>
+            <DanceVideo p={selP} style={{ width: 72, height: 110, borderRadius: 10 }} />
             <View style={{ flex: 1 }}>
               <Text style={{ color: statusInfo(selP, S.lang, now).color, fontWeight: '800' }}>● {statusInfo(selP, S.lang, now).label}</Text>
               <Text style={st.meta}>{selP.specs.join(', ')} · {selP.langs.join(', ')}</Text>
@@ -311,16 +313,59 @@ export function LiveStage({ S, act, rankOf }) {
   );
 }
 
-// Stage tab: the live stage by default, with the browse grid one tap away.
+// Video wall: every on-stage dancer's performance video on one screen (group-show style).
+function VideoWall({ S, W, H, rankOf, onSelect, now }) {
+  const live = S.roster.filter((p) => p.status === 'stage').sort((a, b) => b.coins - a.coins);
+  const priv = S.roster.filter((p) => p.status === 'private');
+  const tw = (W - 4 * 4) / 3;
+  const th = tw * 1.5;
+  return (
+    <View style={{ width: W, height: H, backgroundColor: '#000' }}>
+      <FlatList
+        data={[...live, ...priv]} keyExtractor={(p) => String(p.id)} numColumns={3}
+        contentContainerStyle={{ padding: 4, gap: 4 }} columnWrapperStyle={{ gap: 4 }}
+        initialNumToRender={9} maxToRenderPerBatch={3} windowSize={3} removeClippedSubviews
+        renderItem={({ item: p }) => {
+          const isLive = p.status === 'stage';
+          const spot = S.spotlight?.did === p.id;
+          return (
+            <Pressable onPress={() => onSelect(p.id)} style={{ width: tw, height: th, borderRadius: 10, overflow: 'hidden', borderWidth: spot ? 2 : 1, borderColor: spot ? C.gold : isLive ? C.line : C.amber }}>
+              {isLive && !(S.selfCamera && p.id === S.selfId) ? <DanceVideo p={p} style={{ width: '100%', height: '100%' }} /> : <Poster p={p} dim={!isLive} style={{ width: '100%', height: '100%' }} />}
+              {S.selfCamera && p.id === S.selfId && <View style={{ position: 'absolute', top: th * 0.4, left: 0, right: 0, alignItems: 'center' }}><Text style={{ color: '#fff', fontWeight: '900', fontSize: 11, backgroundColor: C.red, paddingHorizontal: 6, borderRadius: 5, overflow: 'hidden' }}>📷 LIVE CAMERA</Text><Text style={{ color: '#fff', fontSize: 10 }}>tap to watch</Text></View>}
+              <View style={{ position: 'absolute', top: 4, left: 4, flexDirection: 'row', gap: 3 }}>
+                <Text style={{ color: C.gold, fontSize: 10, fontWeight: '900', backgroundColor: 'rgba(0,0,0,0.55)', paddingHorizontal: 4, borderRadius: 4, overflow: 'hidden' }}>#{rankOf[p.id]}</Text>
+                {p.isNew && <Text style={{ color: C.bg, fontSize: 9, fontWeight: '900', backgroundColor: C.green, paddingHorizontal: 4, borderRadius: 4, overflow: 'hidden' }}>NEW</Text>}
+              </View>
+              {isLive && <View style={{ position: 'absolute', top: 6, right: 6, width: 7, height: 7, borderRadius: 4, backgroundColor: C.red }} />}
+              {!isLive && (
+                <View style={{ position: 'absolute', left: 0, right: 0, top: th * 0.38, alignItems: 'center' }}>
+                  <Text style={{ fontSize: 18 }}>🔒</Text>
+                  <Text style={{ color: C.amber, fontSize: 10, fontWeight: '800' }}>private · {Math.max(1, Math.ceil(((p.returnAt || now) - now) / 60000))} min</Text>
+                </View>
+              )}
+              <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: 6, paddingVertical: 3, backgroundColor: 'rgba(0,0,0,0.6)' }}>
+                <Text numberOfLines={1} style={{ color: C.text, fontWeight: '800', fontSize: 12 }}>{p.name}</Text>
+                <Text style={{ color: C.goldLight, fontSize: 10 }}>🪙{fmtK(p.coins)} · {p.langs[0]}</Text>
+              </View>
+            </Pressable>
+          );
+        }}
+      />
+    </View>
+  );
+}
+
+// Stage tab: the live stage by default; video wall and browse grid one tap away.
 export function StageHome({ S, act, rankOf }) {
-  const [view, setView] = useState('live');
+  const [view, setView] = useState('stage');
   return (
     <View style={{ flex: 1 }}>
       <View style={[st.row, { gap: 6, paddingHorizontal: 10, paddingVertical: 6 }]}>
-        <Chip label="🎭 Live stage" on={view === 'live'} onPress={() => setView('live')} />
+        <Chip label="🎭 Live stage" on={view === 'stage'} onPress={() => setView('stage')} />
+        <Chip label="📹 Video wall" on={view === 'wall'} onPress={() => setView('wall')} />
         <Chip label="▦ All dancers" on={view === 'grid'} onPress={() => setView('grid')} />
       </View>
-      {view === 'live' ? <LiveStage S={S} act={act} rankOf={rankOf} /> : <StageTab S={S} act={act} rankOf={rankOf} />}
+      {view === 'grid' ? <StageTab S={S} act={act} rankOf={rankOf} /> : <LiveStage key={view} S={S} act={act} rankOf={rankOf} mode={view} />}
     </View>
   );
 }

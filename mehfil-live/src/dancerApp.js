@@ -4,10 +4,12 @@ import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import Dancer from './Dancer';
 import { Btn, Chip, Stat, st, statusInfo } from './ui';
 import { C, fmt, mmss } from './data';
+import { GoLiveScreen } from './golive';
 
-export function DancerHome({ S, act }) {
+export function DancerHome({ S, act, pad }) {
   const me = S.roster.find((x) => x.id === S.selfId);
   const [msg, setMsg] = useState('');
+  const [live, setLive] = useState(false);
   const now = S.now || Date.now();
   const s = statusInfo(me, S.lang, now);
   const room = S.rooms.find((r) => r.did === me.id);
@@ -29,6 +31,9 @@ export function DancerHome({ S, act }) {
           <Text style={[st.meta, { color: C.green }]}>✓ Profile · ✓ KYC verified · ✓ Bank verified</Text>
         </View>
       </View>
+
+      <Btn label={S.selfCamera ? '📷 Return to my live camera' : '📷 Go live with camera'} onPress={() => setLive(true)} />
+      {live && <GoLiveScreen S={S} act={act} pad={pad || { paddingTop: 0, paddingBottom: 0 }} onClose={() => setLive(false)} />}
 
       {/* BR-75 availability */}
       <View style={st.box}>

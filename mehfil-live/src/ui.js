@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, Easing, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import Dancer from './Dancer';
+import { Poster } from './media';
 import { C, fmtK, minsLeft } from './data';
 import { t } from './i18n';
 
@@ -61,7 +62,7 @@ export const DancerCard = React.memo(function DancerCard({ p, w, rank, lang, onP
         {live && <View style={st.liveDotSm} />}
       </View>
       <View style={{ alignItems: 'center', height: w * 1.05, justifyContent: 'flex-end' }}>
-        <Dancer p={p} size={w * 0.95} mode={spotlight ? 'performing' : live ? 'normal' : 'backstage'} />
+        <Poster p={p} dim={!live} style={{ position: 'absolute', left: -8, top: -8, width: w, height: w * 1.05 + 8 }} />
       </View>
       <Text style={st.cardName} numberOfLines={1}>{p.name}</Text>
       <Text style={st.cardMeta} numberOfLines={1}>🪙{fmtK(p.coins)} · {p.langs.slice(0, 2).join(', ')}</Text>

@@ -2,7 +2,7 @@
   "expo": {
     "name": "Mehfil Live",
     "slug": "mehfil-live-studio-royale",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
     "backgroundColor": "#0a0612",
@@ -11,15 +11,29 @@
     },
     "android": {
       "package": "com.mehfillive.studioroyale",
-      "versionCode": 2,
+      "versionCode": 3,
       "softwareKeyboardLayoutMode": "resize",
       "adaptiveIcon": {
         "backgroundColor": "#0a0612"
-      }
+      },
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "ios": {
       "bundleIdentifier": "com.mehfillive.studioroyale"
     },
-    "scheme": "mehfillive"
+    "scheme": "mehfillive",
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow Mehfil Live to use your camera so you can go live on stage.",
+          "microphonePermission": "Allow Mehfil Live to use your microphone when you go live.",
+          "recordAudioAndroid": true
+        }
+      ]
+    ]
   }
 }

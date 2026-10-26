@@ -3,6 +3,7 @@ import {
   Animated, Easing, FlatList, KeyboardAvoidingView, Modal, Pressable, ScrollView, Share, Text, TextInput, View, useWindowDimensions,
 } from 'react-native';
 import Dancer from './Dancer';
+import { DanceVideo, Poster } from './media';
 import { Banner, Btn, Chip, DancerCard, Floater, Sheet, Stat, st, statusInfo } from './ui';
 import { C, COIN_PACKS, EXCLUSIVE_UNLOCK, GIFTS, LANGS, SONGS, SPECS, fmt, fmtK, mmss } from './data';
 import { LANG_OPTIONS, t } from './i18n';
@@ -155,9 +156,10 @@ export function ProfileModal({ S, act, pad, rankOf, toast }) {
         {/* stage view */}
         <View style={{ height: stageH, backgroundColor: C.bg2, overflow: 'hidden' }}>
           <View style={{ position: 'absolute', top: -20, left: width / 2 - stageH * 0.55, width: stageH * 1.1, height: stageH * 1.3, backgroundColor: S.spotlight?.did === p.id ? 'rgba(212,175,55,0.16)' : 'rgba(255,107,157,0.08)', borderBottomLeftRadius: 400, borderBottomRightRadius: 400 }} />
-          <View style={[st.center, { flex: 1, opacity: live ? 1 : 0.35 }]}>
-            <Dancer p={p} size={stageH * 0.86} mode={S.spotlight?.did === p.id ? 'performing' : live ? 'normal' : 'backstage'} />
-          </View>
+          <Poster p={p} dim style={{ position: 'absolute', left: 0, top: 0, width, height: stageH, opacity: 0.25 }} />
+          {live
+            ? <DanceVideo p={p} camera={S.selfCamera && p.id === S.selfId} style={{ position: 'absolute', top: 0, left: (width - stageH * 0.5625) / 2, width: stageH * 0.5625, height: stageH }} />
+            : <Poster p={p} dim style={{ position: 'absolute', top: 0, left: (width - stageH * 0.5625) / 2, width: stageH * 0.5625, height: stageH }} />}
           {!live && (
             <View style={[st.center, { position: 'absolute', left: 0, right: 0, top: stageH / 2 - 20 }]}>
               <Text style={[st.h3, { color: s.color }]}>{s.label}</Text>
@@ -416,7 +418,8 @@ export function PrivateRoom({ S, act, pad, toast }) {
           <View style={[st.pill, left < 60000 && { borderColor: C.red }]}><Text style={[st.pillTxt, left < 60000 && { color: C.red }]}>⏱ {mmss(left)}</Text></View>
         </View>
         <View style={[st.center, { height: height * 0.4, backgroundColor: C.bg2 }]}>
-          <Dancer p={p} size={height * 0.34} mode="performing" />
+          <Poster p={p} style={{ position: 'absolute', left: 0, top: 0, width: '100%', height: height * 0.4, opacity: 0.25 }} />
+          <DanceVideo p={p} camera={S.selfCamera && p.id === S.selfId} style={{ height: height * 0.4, width: height * 0.4 * 0.5625 }} />
           <View style={{ position: 'absolute', top: 8, right: 8, backgroundColor: 'rgba(61,220,151,0.2)', borderRadius: 10, paddingHorizontal: 8, paddingVertical: 3 }}>
             <Text style={{ color: C.green, fontWeight: '800', fontSize: 11 }}>🛡 Moderator present</Text>
           </View>
